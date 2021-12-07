@@ -1,5 +1,5 @@
 function [pop Fmax Fmin Faver fun]=genetic(popsize, stringlength, a, b,...
-    option, pc, pm, num_iter, crowd, shar, sigmash, alpha,handles)
+    option, pc, pm, num_iter, crowd, shar, elite, eliteSize, hybrid, sigmash, alpha,handles)
 
 % popsize is the population size
 % stringlength is the length of the binary string to represent a real
@@ -65,8 +65,7 @@ for j=1:num_iter
     if shar==1
         pop = sharing(pop, popsize, stringlength, option, sigmash, alpha);
     end
-    [ind1 ind2 wind1 wind2]=roulette(pop, popsize, stringlength, option);%Selection methods
-    pop_temp=pop;
+    
      if option==1 | option==4
         for i=1:popsize
             pop(i,stringlength+2)=fun(pop(i,stringlength+1));
@@ -86,12 +85,39 @@ for j=1:num_iter
         Fmin(j)=min(pop(:,2*stringlength+3));
         Faver(j)=mean(pop(:,2*stringlength+3));
     end
+
+    [ind1 ind2 wind1 wind2]=roulette(pop, popsize, stringlength, option);%Selection methods
     parent1=pop(ind1,:);
     parent2=pop(ind2,:);
+
+    maxFitness = maxk(pop(:,stringlength+2), eliteSize);
+
+    elites = [];
+
+    for e=1:eliteSize
+        arr = pop(pop(:,stringlength+2)>=maxFitness(e),:);
+        for a=1:size(arr,1)
+            elites = [elites; arr(a, :)];
+
+            if size(elites, 1) == eliteSize
+                break;
+            end
+        end
+
+        if size(elites, 1) == eliteSize
+            break;
+        end
+    end
+
     [child1, child2]=crossover(parent1, parent2, a, b, option, fun, stringlength, pc);%crossover
 
     child1m=mutation(child1, a, b, fun, option, stringlength, pm);%mutation
     child2m=mutation(child2, a, b, fun, option, stringlength, pm);
+
+    if elite == 1
+       wind1 = elitism(wind1, pop, elites);
+       wind2 = elitism(wind2, pop, elites);
+    end
     
     pop(wind1,:)=child1m;
     pop(wind2,:)=child2m;

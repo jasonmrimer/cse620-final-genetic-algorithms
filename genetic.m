@@ -131,7 +131,7 @@ else
     ylabel('M(x)');
     plot3(pop(:,2*stringlength+2),pop(:,2*stringlength+1),pop(:,2*stringlength+3),'g*');
     title('Function and Population (initial,niched) plot')
-    hleg1=legend('Function','Initial Optimum','Niche Points','Location','SoutheastOutside',4);
+    hleg1=legend('Function','Initial Optimum','Niche Points','Location','SoutheastOutside');
     
 end
 

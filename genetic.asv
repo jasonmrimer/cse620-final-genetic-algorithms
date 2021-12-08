@@ -87,33 +87,20 @@ for j=1:num_iter
         Faver(j)=mean(pop(:,2*stringlength+3));
     end
 
-    [ind1 ind2 wind1 wind2]=roulette(pop, popsize, stringlength, option);%Selection methods
-    parent1=pop(ind1,:);
-    parent2=pop(ind2,:);
-
     maxFitness = maxk(pop(:,stringlength+2), eliteSize);
 
     for e=1:eliteSize
         for f=1:eliteSize
-            if (maxFitness(f) > elites(e, stringlength+2))
-                elites
+            if (size(elites, 1) < e || maxFitness(f) > elites(e, stringlength+2))
+                matches = pop(pop(:,stringlength+2)==maxFitness(e),:);
+                elites(e, :) = matches(1,:);
             end
-        end
-
-        arr = pop(pop(:,stringlength+2)==maxFitness(e),:);
-        c = intersect(arr(a,:), elites, 'rows');
-        for ar=1:size(arr,1)
-            elites = [elites; arr(ar, :)];
-
-            if size(elites, 1) == eliteSize
-                break;
-            end
-        end
-
-        if size(elites, 1) == eliteSize
-            break;
         end
     end
+
+    [ind1 ind2 wind1 wind2]=roulette(pop, popsize, stringlength, option);%Selection methods
+    parent1=pop(ind1,:);
+    parent2=pop(ind2,:);
 
     child1 = parent1;
     child2 = parent2;
@@ -137,14 +124,12 @@ if option==1 || option==4
     ylabel('M(x)');
     plot(pop(:,stringlength+1),pop(:,stringlength+2),'g*');
     hleg1=legend('Function','Initial Optimum','Niche Points','Location','Southeast');
-    
-    
 else
     xlabel('x');
     ylabel('M(x)');
     plot3(pop(:,2*stringlength+2),pop(:,2*stringlength+1),pop(:,2*stringlength+3),'g*');
     title('Function and Population (initial,niched) plot')
-    hleg1=legend('Function','Initial Optimum','Niche Points','Location','SoutheastOutside',4);
+    hleg1=legend('Function','Initial Optimum','Niche Points','Location','SoutheastOutside');
     
 end
 

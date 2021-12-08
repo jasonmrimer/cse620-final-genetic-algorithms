@@ -14,7 +14,6 @@ function [pop Fmax Fmin Faver fun]=genetic(popsize, stringlength, a, b,...
 % crowd is to specify whether or not to do crowding (1 or 0)
 % shar is to specify whether or not to do sharing (1 or 0)
 % sigmash, alpha are the parameters for sharing
-cla
 
 if option==1 || option==4
     x=a:0.01:b;
@@ -27,6 +26,7 @@ switch option
     case 1
         fun= @(x) sin(5*pi*x)^6;
         axes(handles.axes1);
+        cla;
         h1=plot(x,sin(5*pi*x).^6);
         hold on
     case 4
@@ -124,8 +124,6 @@ if option==1 || option==4
     ylabel('M(x)');
     plot(pop(:,stringlength+1),pop(:,stringlength+2),'g*');
     hleg1=legend('Function','Initial Optimum','Niche Points','Location','Southeast');
-    
-    
 else
     xlabel('x');
     ylabel('M(x)');

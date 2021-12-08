@@ -109,8 +109,13 @@ for j=1:num_iter
         end
     end
 
-    [child1, child2]=crossover(parent1, parent2, a, b, option, fun, stringlength, pc);%crossover
-
+    child1 = parent1;
+    child2 = parent2;
+    
+    if crowd~=1
+        [child1, child2]=crossover(parent1, parent2, a, b, option, fun, stringlength, pc);%crossover
+    end
+    
     child1m=mutation(child1, a, b, fun, option, stringlength, pm);%mutation
     child2m=mutation(child2, a, b, fun, option, stringlength, pm);
 
@@ -144,7 +149,7 @@ plot(Fmax), hold on, plot(Faver,'r-'), hold on, plot(Fmin,'g');
 xlabel('Generation')
 ylabel('Fitness')
 title('Fitness Progress')
-legend('Maximum Fitness','Mean Fitness','Minimum Fitness',4)
+legend('Maximum Fitness','Mean Fitness','Minimum Fitness','Location', 'best')
 
 % if crowd==1 
 %     name1=strcat('crowding','pc','pm','b');

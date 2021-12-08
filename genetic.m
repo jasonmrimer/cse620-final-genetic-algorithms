@@ -96,8 +96,8 @@ for j=1:num_iter
 
     for e=1:eliteSize
         arr = pop(pop(:,stringlength+2)>=maxFitness(e),:);
-        for a=1:size(arr,1)
-            elites = [elites; arr(a, :)];
+        for ar=1:size(arr,1)
+            elites = [elites; arr(ar, :)];
 
             if size(elites, 1) == eliteSize
                 break;

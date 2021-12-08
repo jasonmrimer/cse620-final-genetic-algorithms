@@ -392,7 +392,7 @@ function hyrbridization_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of hyrbridization
 
-
+function eliteSize_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function eliteSize_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to eliteSize (see GCBO)

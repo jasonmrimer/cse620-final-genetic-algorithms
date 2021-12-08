@@ -52,6 +52,7 @@ switch option
         h1=surf(x,y,z);
         hold on
 end
+elites = [];
 pop=initialise(popsize, stringlength, a, b, fun, option); %Initialization
 if option==1 || option==4
     plot(pop(:,stringlength+1),pop(:,stringlength+2),'r*');
@@ -86,28 +87,20 @@ for j=1:num_iter
         Faver(j)=mean(pop(:,2*stringlength+3));
     end
 
+    maxFitness = maxk(pop(:,stringlength+2), eliteSize);
+
+    for e=1:eliteSize
+        for f=1:eliteSize
+            if (size(elites, 1) < e || maxFitness(f) > elites(e, stringlength+2))
+                matches = pop(pop(:,stringlength+2)==maxFitness(e),:);
+                elites(e, :) = matches(1,:);
+            end
+        end
+    end
+
     [ind1 ind2 wind1 wind2]=roulette(pop, popsize, stringlength, option);%Selection methods
     parent1=pop(ind1,:);
     parent2=pop(ind2,:);
-
-    maxFitness = maxk(pop(:,stringlength+2), eliteSize);
-
-    elites = [];
-
-    for e=1:eliteSize
-        arr = pop(pop(:,stringlength+2)>=maxFitness(e),:);
-        for ar=1:size(arr,1)
-            elites = [elites; arr(ar, :)];
-
-            if size(elites, 1) == eliteSize
-                break;
-            end
-        end
-
-        if size(elites, 1) == eliteSize
-            break;
-        end
-    end
 
     child1 = parent1;
     child2 = parent2;
@@ -118,15 +111,13 @@ for j=1:num_iter
     
     child1m=mutation(child1, a, b, fun, option, stringlength, pm);%mutation
     child2m=mutation(child2, a, b, fun, option, stringlength, pm);
-
-    if elite == 1
-       wind1 = elitism(wind1, pop, elites);
-       wind2 = elitism(wind2, pop, elites);
-    end
     
     pop(wind1,:)=child1m;
     pop(wind2,:)=child2m;
     
+    if elite == 1
+       elitism(pop, elites, eliteSize, stringlength);
+    end
 end
 if option==1 || option==4
     xlabel('x');

@@ -15,13 +15,8 @@ function [pop Fmax Fmin Faver fun]=genetic(popsize, stringlength, a, b,...
 % shar is to specify whether or not to do sharing (1 or 0)
 % sigmash, alpha are the parameters for sharing
 
-if option==1 || option==4
-    x=a:0.01:b;
-    y=a:0.01:b;
-else
-    x=a:0.5:b;
-    y=a:0.5:b;
-end
+[x, y] = initialize_graph_axes(option, a, b);
+
 switch option
     case 1
         fun= @(x) sin(5*pi*x)^6;
@@ -56,11 +51,9 @@ switch option
 end
 elites = [];
 pop=initialise(popsize, stringlength, a, b, fun, option); %Initialization
-if option==1 || option==4
-    plot(pop(:,stringlength+1),pop(:,stringlength+2),'r*');
-else
-    plot3(pop(:,2*stringlength+2),pop(:,2*stringlength+1),pop(:,2*stringlength+3),'w*');
-end
+
+plot_baseline_benchmark(option, pop, stringlength);
+
 for j=1:num_iter
     if crowd==1
         pop=crowding(pop, popsize, stringlength, a, b, fun, option);
@@ -158,3 +151,21 @@ end
 %%%%%%%%%%%%%%%%%%
 %End of function
 %%%%%%%%%%%%%%%%%%
+
+function plot_baseline_benchmark(option, pop, stringlength)
+if option==1 || option==4
+    plot(pop(:,stringlength+1),pop(:,stringlength+2),'r*');
+else
+    plot3(pop(:,2*stringlength+2),pop(:,2*stringlength+1),pop(:,2*stringlength+3),'w*');
+end
+end
+
+function [x, y] = initialize_graph_axes(option, a, b)
+if option==1 || option==4
+    x=a:0.01:b;
+    y=a:0.01:b;
+else
+    x=a:0.5:b;
+    y=a:0.5:b;
+end
+end

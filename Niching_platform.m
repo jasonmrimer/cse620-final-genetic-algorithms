@@ -82,16 +82,16 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 cla
 %%%%
 popsize  = str2num(get(handles.pop_size,'String'));
-num_iter = str2num(get(handles.gene_size,'String'));
+total_generations = str2num(get(handles.gene_size,'String'));
 stringlength = str2num(get(handles.chrome_size,'String'));
 range_low    = str2num(get(handles.range_low,'String'));
 range_high   = str2num(get(handles.range_high,'String'));
 option   = get(handles.function1,'Value');
 if get(handles.function2,'Value')
     option = 4;
-elseif get(handles.function3,'Value')
-    option = 6;
-elseif ~get(handles.function1,'Value')&~get(handles.function2,'Value')&get(handles.function3,'Value')
+% elseif get(handles.function3,'Value')
+%     option = 6;
+elseif ~get(handles.function1,'Value')&~get(handles.function2,'Value')
     warndlg('Please choose Function!');
     return;
 end
@@ -104,7 +104,7 @@ eliteSize  = str2num(get(handles.eliteSize,'String'));
 hybrid     = get(handles.hyrbridization,'Value');
 sigmash  = str2num(get(handles.sigma,'String'));
 alpha    = str2num(get(handles.alpha,'String'));
-[pop Fmax Fmin Faver fun] = genetic(popsize, stringlength, range_low, range_high, option, pc, pm, num_iter, crowd, shar, elite, eliteSize, hybrid, sigmash, alpha,handles);
+[pop Fmax Fmin Faver fun] = genetic(popsize, stringlength, range_low, range_high, option, pc, pm, total_generations, crowd, shar, elite, eliteSize, hybrid, sigmash, alpha,handles);
 handles.population        = pop;
 handles.Fmaxvalue         = Fmax;
 handles.Fminvalue         = Fmin;
@@ -140,7 +140,7 @@ function function2_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in function3.
-function function3_Callback(hObject, eventdata, handles)
+% function function3_Callback(hObject, eventdata, handles)
 % hObject    handle to function3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)

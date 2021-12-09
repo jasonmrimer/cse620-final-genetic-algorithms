@@ -32,6 +32,7 @@ switch option
     case 4
         fun= @(x) exp(-2*log(2)*((x-0.08)/0.854)^2)*sin(5*pi*(x^0.75-0.05))^6;
         axes(handles.axes1);
+        cla;
         h1=plot(x,exp(-2*log(2)*((x-0.08)/0.854).^2).*sin(5*pi*(x.^0.75-0.05)).^6);
         hold on
     case 6
@@ -49,6 +50,7 @@ switch option
             end
         end
         axes(handles.axes1);
+        cla;
         h1=surf(x,y,z);
         hold on
 end

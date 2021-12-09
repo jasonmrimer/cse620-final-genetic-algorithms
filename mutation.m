@@ -1,4 +1,10 @@
-function [child]=mutation(parent, a, b, fun, option, stringlength, pm)
+function [child]=mutation( ...
+    parent, ...
+    domain_start, ...
+    domain_end, ...
+    fitness_function, ...
+    chromosome_length, ...
+    probability_of_mutation)
 %%% Description: mutation algorithm
 %%% parent is the parent population
 %%% [a,b] is the range of real values
@@ -6,33 +12,24 @@ function [child]=mutation(parent, a, b, fun, option, stringlength, pm)
 %%% stringlenrth is the length of chromesome which is used to present single
 %%%value
 %%% pm is the probability of mutation
-
-if option==1 || option==4
     
-    if (rand<pm)
-        mpoint=round(rand*(stringlength-1))+1;
+    if (rand<probability_of_mutation)
+        mpoint=calculate_limited_mutation_point(chromosome_length);
         child=parent;
         child(mpoint)=abs(parent(mpoint)-1);
-        child(:, stringlength+1)=sum(2.^(size(child(:,1:stringlength),2)-1:-1:0).*child(:,1:stringlength))*(b-a)/ (2.^stringlength-1)+a;
-        child(:, stringlength+2)=fun(child(:, stringlength+1));
-    else
-        child=parent;
-    end
-else
-    if (rand<pm)
-        mpoint=round(rand*(stringlength-1))+1;
-        child=parent;
-        child(mpoint)=abs(parent(mpoint)-1);
-        child(stringlength + mpoint)=abs(parent(stringlength + mpoint)-1);
-        child(:, 2*stringlength+1)=sum(2.^(size(child(:,1:stringlength),2)-1:-1:0).*child(:,1:stringlength))*(b-a)/ (2.^stringlength-1)+a;
-        child(:, 2*stringlength+2)=sum(2.^(size(child(:,1:stringlength),2)-1:-1:0).*child(:,stringlength+1:2*stringlength))*(b-a)/ (2.^stringlength-1)+a;
-
-        child(:, 2*stringlength+3)=fun(child(:, 2*stringlength+1), child(:, 2*stringlength+2));
+        child(:, chromosome_length+1)=sum(2.^(size(child(:,1:chromosome_length),2)-1:-1:0).*child(:,1:chromosome_length))*(domain_end-domain_start)/ (2.^chromosome_length-1)+domain_start;
+        child(:, chromosome_length+2)=fitness_function(child(:, chromosome_length+1));
     else
         child=parent;
     end
 end
-
 %%%%%%%%%%%%%%%%%%%
 %End of function
 %%%%%%%%%%%%%%%%%%%
+function mutation_point = calculate_full_mutation_point(chromosome_length)
+    mutation_point=round(rand*(chromosome_length-1))+1;
+end
+
+function mutation_point = calculate_limited_mutation_point(chromosome_length)
+    mutation_point=round(rand*(chromosome_length / 2-1))+1+chromosome_length / 2;
+end

@@ -1,77 +1,79 @@
-function [pop Fmax Fmin Faver benchmark_function]=genetic(popsize, stringlength, a, b,...
-    option, pc, pm, total_generations, crowd, shar, elite, eliteSize, hybrid, sigmash, alpha,handles)
-
-% popsize is the population size
-% stringlength is the length of the binary string to represent a real
-% variable
-% [a, b] is the function's domain
 % option is for the function selection
 % option=1: for M1 function
 % option=4: for M4 function
-% option=6: for M6 function
-% pc & pm are the crossover and the mutation probabilities
-% num_iter is the number of iterations
-% crowd is to specify whether or not to do crowding (1 or 0)
-% shar is to specify whether or not to do sharing (1 or 0)
 % sigmash, alpha are the parameters for sharing
 
-[x, y] = initialize_graph_axes(option, a, b, handles);
-benchmark_function = setup_benchmark(option);
-plot(x,benchmark_function(x));
+function [population, Fmax, Fmin, Faver, benchmark_function]=genetic( ...
+    population_size, ...
+    chromosome_length, ...
+    benchmark_domain_start, ...
+    benchmark_domain_end,...
+    option, ...
+    probability_of_crossover, ...
+    probability_of_mutation, ...
+    total_generations, ...
+    does_crowding, ...
+    does_sharing, elite, eliteSize, hybrid, sigmash, alpha,handles)
 
-elites = [];
-Fmax = zeros(1, total_generations);
-Fmin = zeros(1, total_generations);
-Faver = zeros(1, total_generations);
 
-pop = initialise(popsize, stringlength, a, b, benchmark_function, option); %Initialization
-plot_baseline_benchmark(option, pop, stringlength);
+    [x, y] = initialize_graph_axes(option, benchmark_domain_start, benchmark_domain_end, handles);
+    benchmark_function = setup_benchmark(option);
+    plot(x,benchmark_function(x));
+    
+    elites = [];
+    Fmax = zeros(1, total_generations);
+    Fmin = zeros(1, total_generations);
+    Faver = zeros(1, total_generations);
+    
+    population = initialise(population_size, chromosome_length, benchmark_domain_start, benchmark_domain_end, benchmark_function, option);
+    plot_baseline_benchmark(option, population, chromosome_length);
 
-for j=1:total_generations
-    if crowd==1
-        pop=crowding(pop, popsize, stringlength, a, b, benchmark_function, option);
+    for j=1:total_generations
+        if does_crowding==1
+            population=crowding(population, population_size, chromosome_length, benchmark_domain_start, benchmark_domain_end, benchmark_function, option);
+        end
+        
+        if does_sharing==1
+            population = sharing(population, population_size, chromosome_length, option, sigmash, alpha);
+        end
+        
+        population = calculate_fitness(population, population_size, chromosome_length, benchmark_function);
+        [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(population, chromosome_length);
+        
+        
+    
+        [ind1, ind2, wind1, wind2]=roulette(population, population_size, chromosome_length, option);%Selection methods
+        
+        parent1=population(ind1,:);
+        parent2=population(ind2,:);
+    
+        child1 = parent1;
+        child2 = parent2;
+        
+        if does_crowding~=1
+            [child1, child2]=crossover(parent1, parent2, benchmark_domain_start, benchmark_domain_end, option, benchmark_function, chromosome_length, probability_of_crossover);%crossover
+        end
+        
+        population = mutate_two_children(population, child1, child2, ...
+            benchmark_domain_start, benchmark_domain_end, benchmark_function, ...
+            chromosome_length, probability_of_mutation, ...
+            wind1, wind2);
+        
+        elites = find_elites_from_pop(population, chromosome_length, eliteSize, elites);
+        if elite == 1
+           elitism(population, elites, eliteSize, chromosome_length);
+        end
     end
     
-    if shar==1
-        pop = sharing(pop, popsize, stringlength, option, sigmash, alpha);
-    end
-    
-    pop = calculate_fitness(pop, popsize, stringlength, benchmark_function);
-    [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(pop, stringlength);
-    
-    
-
-    [ind1 ind2 wind1 wind2]=roulette(pop, popsize, stringlength, option);%Selection methods
-    parent1=pop(ind1,:);
-    parent2=pop(ind2,:);
-
-    child1 = parent1;
-    child2 = parent2;
-    
-    if crowd~=1
-        [child1, child2]=crossover(parent1, parent2, a, b, option, benchmark_function, stringlength, pc);%crossover
-    end
-    
-    child1m=mutation(child1, a, b, benchmark_function, option, stringlength, pm);%mutation
-    child2m=mutation(child2, a, b, benchmark_function, option, stringlength, pm);
-    
-    pop(wind1,:)=child1m;
-    pop(wind2,:)=child2m;
-    
-    elites = find_elites_from_pop(pop, stringlength, eliteSize, elites);
-    if elite == 1
-       elitism(pop, elites, eliteSize, stringlength);
-    end
-end
     if option==1 || option==4
         xlabel('x');
         ylabel('M(x)');
-        plot(pop(:,stringlength+1),pop(:,stringlength+2),'g*');
+        plot(population(:,chromosome_length+1),population(:,chromosome_length+2),'g*');
         hleg1=legend('Function','Initial Optimum','Niche Points','Location','Southeast');
     else
         xlabel('x');
         ylabel('M(x)');
-        plot3(pop(:,2*stringlength+2),pop(:,2*stringlength+1),pop(:,2*stringlength+3),'g*');
+        plot3(population(:,2*chromosome_length+2),population(:,2*chromosome_length+1),population(:,2*chromosome_length+3),'g*');
         title('Function and Population (initial,niched) plot')
         hleg1=legend('Function','Initial Optimum','Niche Points','Location','SoutheastOutside');
         
@@ -145,4 +147,12 @@ function elites = find_elites_from_pop(pop, stringlength, eliteSize, elites);
             end
         end
     end
+end
+
+function population = mutate_two_children(population, child1, child2, benchmark_domain_start, benchmark_domain_end, benchmark_function, chromosome_length, probability_of_mutation, wind1, wind2)
+    child1m=mutation(child1, benchmark_domain_start, benchmark_domain_end, benchmark_function, chromosome_length, probability_of_mutation);%mutation
+    child2m=mutation(child2, benchmark_domain_start, benchmark_domain_end, benchmark_function, chromosome_length, probability_of_mutation);
+    
+    population(wind1,:)=child1m;
+    population(wind2,:)=child2m;
 end

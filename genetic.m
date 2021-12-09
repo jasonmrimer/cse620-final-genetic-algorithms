@@ -39,16 +39,7 @@ for j=1:total_generations
     pop = calculate_fitness(pop, popsize, stringlength, benchmark_function);
     [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(pop, stringlength);
     
-    maxFitness = maxk(pop(:,stringlength+2), eliteSize);
-
-    for e=1:eliteSize
-        for f=1:eliteSize
-            if (size(elites, 1) < e || maxFitness(f) > elites(e, stringlength+2))
-                matches = pop(pop(:,stringlength+2)==maxFitness(e),:);
-                elites(e, :) = matches(1,:);
-            end
-        end
-    end
+    
 
     [ind1 ind2 wind1 wind2]=roulette(pop, popsize, stringlength, option);%Selection methods
     parent1=pop(ind1,:);
@@ -67,6 +58,7 @@ for j=1:total_generations
     pop(wind1,:)=child1m;
     pop(wind2,:)=child2m;
     
+    elites = find_elites_from_pop(pop, stringlength, eliteSize, elites);
     if elite == 1
        elitism(pop, elites, eliteSize, stringlength);
     end
@@ -140,4 +132,17 @@ function [Fmax, Fmin, Faver] = capture_generation_fitness_measures(pop, stringle
     Fmax=max(pop(:,stringlength+2));
     Fmin=min(pop(:,stringlength+2));
     Faver=mean(pop(:,stringlength+2));
+end
+
+function elites = find_elites_from_pop(pop, stringlength, eliteSize, elites);
+    maxFitness = maxk(pop(:,stringlength+2), eliteSize);
+
+    for e=1:eliteSize
+        for f=1:eliteSize
+            if (size(elites, 1) < e || maxFitness(f) > elites(e, stringlength+2))
+                matches = pop(pop(:,stringlength+2)==maxFitness(e),:);
+                elites(e, :) = matches(1,:);
+            end
+        end
+    end
 end

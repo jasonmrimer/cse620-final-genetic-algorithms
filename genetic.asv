@@ -37,10 +37,10 @@ for j=1:total_generations
     end
     
     pop = calculate_fitness(pop, popsize, stringlength, benchmark_function);
-    [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(j, pop, stringlength)   
-    Fmax(j)=max(pop(:,stringlength+2));
-    Fmin(j)=min(pop(:,stringlength+2));
-    Faver(j)=mean(pop(:,stringlength+2));
+    [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(pop, stringlength);
+    
+    elites = find_elites_from_pop(pop, stringlength, eliteSize, elites);
+    
     maxFitness = maxk(pop(:,stringlength+2), eliteSize);
 
     for e=1:eliteSize
@@ -138,8 +138,8 @@ function pop = calculate_fitness(pop, popsize, stringlength, benchmark_function)
     end
 end
 
-function capture_generation_fitness_measures(j, pop, stringlength)
-    Fmax(j)=max(pop(:,stringlength+2));
-    Fmin(j)=min(pop(:,stringlength+2));
-    Faver(j)=mean(pop(:,stringlength+2));
+function [Fmax, Fmin, Faver] = capture_generation_fitness_measures(pop, stringlength)
+    Fmax=max(pop(:,stringlength+2));
+    Fmin=min(pop(:,stringlength+2));
+    Faver=mean(pop(:,stringlength+2));
 end

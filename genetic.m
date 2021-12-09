@@ -1,4 +1,4 @@
-function [pop Fmax Fmin Faver fun]=genetic(popsize, stringlength, a, b,...
+function [pop Fmax Fmin Faver benchmark_function]=genetic(popsize, stringlength, a, b,...
     option, pc, pm, num_iter, crowd, shar, elite, eliteSize, hybrid, sigmash, alpha,handles)
 
 % popsize is the population size
@@ -15,48 +15,18 @@ function [pop Fmax Fmin Faver fun]=genetic(popsize, stringlength, a, b,...
 % shar is to specify whether or not to do sharing (1 or 0)
 % sigmash, alpha are the parameters for sharing
 
-[x, y] = initialize_graph_axes(option, a, b);
+[x, y] = initialize_graph_axes(option, a, b, handles);
+benchmark_function = setup_benchmark(option);
+plot(x,benchmark_function(x));
 
-switch option
-    case 1
-        fun= @(x) sin(5*pi*x)^6;
-        axes(handles.axes1);
-        cla;
-        h1=plot(x,sin(5*pi*x).^6);
-        hold on
-    case 4
-        fun= @(x) exp(-2*log(2)*((x-0.08)/0.854)^2)*sin(5*pi*(x^0.75-0.05))^6;
-        axes(handles.axes1);
-        cla;
-        h1=plot(x,exp(-2*log(2)*((x-0.08)/0.854).^2).*sin(5*pi*(x.^0.75-0.05)).^6);
-        hold on
-    case 6
-        for i=1:25
-            a1(i)=16*(mod(i-1,5)-2);%%Function defined 
-            b1(i)=16*((i-1)/5-2);
-%             a1(i)=0.5*i;
-%             b1(i)=i;
-        end
-        fun= @(x,y) 500-(1./(0.002+sum(1./(1+(0:24)+(x-a1).^6+(y-b1).^6))));
-        
-        for j=1:length(x)
-            for k=1:length(y)
-                z(j,k)= fun(x(j),y(k));
-            end
-        end
-        axes(handles.axes1);
-        cla;
-        h1=surf(x,y,z);
-        hold on
-end
 elites = [];
-pop=initialise(popsize, stringlength, a, b, fun, option); %Initialization
+pop=initialise(popsize, stringlength, a, b, benchmark_function, option); %Initialization
 
 plot_baseline_benchmark(option, pop, stringlength);
 
 for j=1:num_iter
     if crowd==1
-        pop=crowding(pop, popsize, stringlength, a, b, fun, option);
+        pop=crowding(pop, popsize, stringlength, a, b, benchmark_function, option);
     end
     if shar==1
         pop = sharing(pop, popsize, stringlength, option, sigmash, alpha);
@@ -64,11 +34,11 @@ for j=1:num_iter
     
      if option==1 | option==4
         for i=1:popsize
-            pop(i,stringlength+2)=fun(pop(i,stringlength+1));
+            pop(i,stringlength+2)=benchmark_function(pop(i,stringlength+1));
         end
      else
         for i=1:popsize
-            pop(i,2*stringlength+3)=fun(pop(i,2*stringlength+1),pop(i,2*stringlength+2));
+            pop(i,2*stringlength+3)=benchmark_function(pop(i,2*stringlength+1),pop(i,2*stringlength+2));
         end
      end
     
@@ -101,11 +71,11 @@ for j=1:num_iter
     child2 = parent2;
     
     if crowd~=1
-        [child1, child2]=crossover(parent1, parent2, a, b, option, fun, stringlength, pc);%crossover
+        [child1, child2]=crossover(parent1, parent2, a, b, option, benchmark_function, stringlength, pc);%crossover
     end
     
-    child1m=mutation(child1, a, b, fun, option, stringlength, pm);%mutation
-    child2m=mutation(child2, a, b, fun, option, stringlength, pm);
+    child1m=mutation(child1, a, b, benchmark_function, option, stringlength, pm);%mutation
+    child2m=mutation(child2, a, b, benchmark_function, option, stringlength, pm);
     
     pop(wind1,:)=child1m;
     pop(wind2,:)=child2m;
@@ -153,19 +123,33 @@ end
 %%%%%%%%%%%%%%%%%%
 
 function plot_baseline_benchmark(option, pop, stringlength)
-if option==1 || option==4
-    plot(pop(:,stringlength+1),pop(:,stringlength+2),'r*');
-else
-    plot3(pop(:,2*stringlength+2),pop(:,2*stringlength+1),pop(:,2*stringlength+3),'w*');
-end
+    if option==1 || option==4
+        plot(pop(:,stringlength+1),pop(:,stringlength+2),'r*');
+    else
+        plot3(pop(:,2*stringlength+2),pop(:,2*stringlength+1),pop(:,2*stringlength+3),'w*');
+    end
 end
 
-function [x, y] = initialize_graph_axes(option, a, b)
-if option==1 || option==4
-    x=a:0.01:b;
-    y=a:0.01:b;
-else
-    x=a:0.5:b;
-    y=a:0.5:b;
+function [x, y] = initialize_graph_axes(option, a, b, handles)
+    if option==1 || option==4
+        x=a:0.01:b;
+        y=a:0.01:b;
+    else
+        x=a:0.5:b;
+        y=a:0.5:b;
+    end
+    
+    axes(handles.axes1);
+    cla;
 end
+
+function benchmark_function = setup_benchmark(option)
+    switch option
+        case 1
+            benchmark_function= @(x) sin(5*pi*x).^6;        
+            hold on
+        case 4
+            benchmark_function= @(x) exp(-2*log(2)*((x-0.08)/0.854).^2).*sin(5*pi*(x.^0.75-0.05)).^6;
+            hold on
+    end
 end

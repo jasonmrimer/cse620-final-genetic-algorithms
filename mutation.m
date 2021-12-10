@@ -13,17 +13,25 @@ function [child]=mutation( ...
 %%%value
 %%% pm is the probability of mutation
     
-if (rand<probability_of_mutation)
-    mpoint=round(rand*(chromosome_length-1))+1;
-    child=parent;
-    child(mpoint)=abs(parent(mpoint)-1);
-    child(:, chromosome_length+1)=sum(2.^(size(child(:,1:chromosome_length),2)-1:-1:0).*child(:,1:chromosome_length))*(domain_end-domain_start)/ (2.^chromosome_length-1)+domain_start;
-    child(:, chromosome_length+2)=fitness_function(child(:, chromosome_length+1));
-    display("p: " + parent);
-    display("c: " + child);
-else
-    child=parent;
+    if (rand<probability_of_mutation)
+        mpoint=calculate_limited_mutation_point(chromosome_length);
+        child=parent;
+        child(mpoint)=abs(parent(mpoint)-1);
+        child(:, chromosome_length+1)=sum(2.^(size(child(:,1:chromosome_length),2)-1:-1:0).*child(:,1:chromosome_length))*(domain_end-domain_start)/ (2.^chromosome_length-1)+domain_start;
+        child(:, chromosome_length+2)=fitness_function(child(:, chromosome_length+1));
+        display("p: " + parent);
+        display("c: " + child);
+    else
+        child=parent;
+    end
 end
 %%%%%%%%%%%%%%%%%%%
 %End of function
 %%%%%%%%%%%%%%%%%%%
+function mutation_point = calculate_full_mutation_point(chromosome_length)
+    mutation_point=round(rand*(chromosome_length-1))+1;
+end
+
+function mutation_point = calculate_limited_mutation_point(chromosome_length)
+    mutation_point=round(rand*(chromosome_length / 2-1))+1+chromosome_length / 2;
+end

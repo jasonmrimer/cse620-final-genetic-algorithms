@@ -6,7 +6,7 @@ if option==1 || option==4
     for i=1:ceil(sizepop/2)
         p1= newpop(i,:);
         p2= newpop(i+1,:);
-        [c1, c2]=crossover(p1, p2, a, b, option, fun, stringlength, 1);
+        [c1, c2]=crossover(p1, p2, a, b, fun, stringlength, 1);
         c11=mutation(c1, a, b, fun, stringlength, 1);
         c22=mutation(c2, a, b, fun, stringlength, 1);
         if abs(p1(:, stringlength+1)-c11(:, stringlength+1))+abs(p2(:, stringlength+1)-c22(:, stringlength+1))...

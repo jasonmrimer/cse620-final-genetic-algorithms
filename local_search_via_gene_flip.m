@@ -1,4 +1,12 @@
-function best_neighbor = local_search_gene_flip( ...
+% test case
+% input
+% [0 0 0 0 1 1 1 0 1 1 0.057674 0.2376]
+% 10
+% @(x) sin(5*pi*x).
+% expected result
+% [0 1 0 0 1 1 1 0 1 1 0.3079 0.9545]
+
+function best_neighbor = local_search_via_gene_flip( ...
     member, ...
     genome_length, ...
     fitness_function, ...
@@ -12,13 +20,6 @@ function best_neighbor = local_search_gene_flip( ...
     end
 end
 
-% test case
-% input
-% [0 0 0 0 1 1 1 0 1 1 0.057674 0.2376]
-% 10
-% @(x) sin(5*pi*x).
-% expect result
-% [0 1 0 0 1 1 1 0 1 1 0.057674 0.2376]
 function neighbor = flip_gene(member, gene_index)
     neighbor = member;
     neighbor(gene_index) = abs(neighbor(gene_index)-1);

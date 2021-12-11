@@ -28,13 +28,14 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
     population = initialise(population_size, chromosome_length, domain_start, domain_end, fitness_function, option);
     plot_baseline_benchmark(option, population, chromosome_length);
 
+    breeder_percentage = 0.1;
+
     for j=1:total_generations
-        
-        population = crossover_entire_population(population, domain_start, domain_end, fitness_function, ...
-            chromosome_length, probability_of_crossover);
-        
-        population = mutate_entire_population(population, domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation);
-        
+%         population = crossover_entire_population(population, domain_start, domain_end, fitness_function, ...
+%             chromosome_length, probability_of_crossover);
+%         
+%         population = mutate_entire_population(population, domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation);
+%         
         if does_crowding==1
             population=crowding(population, population_size, chromosome_length, domain_start, domain_end, fitness_function, option);
         end
@@ -51,13 +52,16 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
         parent1=population(ind1,:);
         parent2=population(ind2,:);
     
-        child1 = parent1;
-        child2 = parent2;
-        
-%         population = mutate_two_children(population, child1, child2, ...
-%             benchmark_domain_start, benchmark_domain_end, fitness_function, ...
-%             chromosome_length, probability_of_mutation, ...
-%             wind1, wind2);
+        [child1, child2] = crossover( ...
+            parent1, parent2, ...
+            domain_start, domain_end, ...
+            fitness_function, chromosome_length, ...
+            probability_of_crossover);
+
+        population = mutate_two_children(population, child1, child2, ...
+            domain_start, domain_end, fitness_function, ...
+            chromosome_length, probability_of_mutation, ...
+            wind1, wind2);
         
         elites = find_elites_from_pop(population, chromosome_length, eliteSize, elites);
         if elite == 1
@@ -193,4 +197,3 @@ function new_population = crossover_entire_population(population, benchmark_doma
         result = indeces(1) > indeces(2);
     end
 end
-

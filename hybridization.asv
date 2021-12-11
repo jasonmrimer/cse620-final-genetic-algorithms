@@ -1,6 +1,6 @@
 function population_after_local_search = run_local_search_on_offspring( ...
             population, ...
-            chromosome_length, ...
+            genome_length, ...
             fitness_function, ...
             wind1, wind2)
 %     evaluate offspring fitness
@@ -10,9 +10,11 @@ function population_after_local_search = run_local_search_on_offspring( ...
 % keep if better
     child_indeces = [wind1, wind2];
     for child=1:2
-        for chromosome=1:chromosome_length
-            parent = population(child_indeces(child));
-            parent(chromosome) = abs(parent(mpoint)-1);
+        best_neighbor = population(child_indeces(child));
+        for gene=1:genome_length
+            neighbor = best_neighbor;
+            neighbor(gene) = abs(parent(mpoint)-1);
+            if fitness_function()
         end
     end
 end

@@ -13,6 +13,7 @@ if option==1 || option==4
             else
                 sh(j)=0;
             end
+            
         end
         newpop(i,stringlength+2)=newpop(i,stringlength+2)/sum(sh);
     end

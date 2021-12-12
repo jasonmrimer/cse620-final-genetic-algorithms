@@ -2,10 +2,10 @@ function [ind1, ind2, wind1, wind2]=roulette(oldpop, popsize, stringlength, opti
 %%%Description: roulette selection method
 
 if option==1 || option==4
-    totalfit=sum(oldpop(:,stringlength+2));
-    prob=oldpop(:,stringlength+2)/totalfit;
-    probsort=sort(prob, 'descend');
-    prob1=cumsum(probsort);
+    totalfit=sum(oldpop(:,stringlength+2)); % sum the fitness
+    prob=oldpop(:,stringlength+2)/totalfit; % make separate array of fitness only
+    probsort=sort(prob, 'descend'); % sort fitness
+    prob1=cumsum(probsort); 
     %prob1=[0;prob1];prob1(end)=[];
 
     ind11=max(find(prob1>rand(1,1),1, 'first'));

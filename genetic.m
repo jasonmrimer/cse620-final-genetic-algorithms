@@ -5,7 +5,7 @@
 
 function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
     population_size, ...
-    chromosome_length, ...
+    genome_length, ...
     domain_start, ...
     domain_end,...
     option, ...
@@ -25,22 +25,23 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
     Fmin = zeros(1, total_generations);
     Faver = zeros(1, total_generations);
     
-    population = initialise(population_size, chromosome_length, domain_start, domain_end, fitness_function, option);
-    plot_baseline_benchmark(option, population, chromosome_length);
+    population = initialise(population_size, genome_length, domain_start, domain_end, fitness_function, option);
+    plot_baseline_benchmark(option, population, genome_length);
+
+    breeder_percentage = 0.1;
 
     for j=1:total_generations
-        
-        population = crossover_entire_population(population, domain_start, domain_end, fitness_function, ...
-            chromosome_length, probability_of_crossover);
-        
-        population = mutate_entire_population(population, domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation);
-        
+%         population = crossover_entire_population(population, domain_start, domain_end, fitness_function, ...
+%             chromosome_length, probability_of_crossover);
+%         
+%         population = mutate_entire_population(population, domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation);
+%         
         if does_crowding==1
-            population=crowding(population, population_size, chromosome_length, domain_start, domain_end, fitness_function, option);
+            population=crowding(population, population_size, genome_length, domain_start, domain_end, fitness_function, option);
         end
         
         if does_sharing==1
-            population = sharing(population, population_size, chromosome_length, option, sigmash, alpha);
+            population = sharing(population, population_size, genome_length, option, sigmash, alpha);
         end
         
         population = calculate_fitness(population, population_size, chromosome_length, fitness_function);
@@ -56,17 +57,39 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
             end
         end
     
-        for p=1:size(population)/2
-            [ind1, ind2, wind1, wind2]=roulette(population, population_size, chromosome_length, option);%Selection methods
-        
-            parent1=population(ind1,:);
-            parent2=population(ind2,:);
-        
-            child1m=mutation(parent1, domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation);%mutation
-            child2m=mutation(parent2, domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation);
+        population = calculate_fitness(population, population_size, genome_length, fitness_function);
+        [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(population, genome_length);  
     
-            population_prime=[population_prime; child1m];
-            population_prime=[population_prime; child2m];
+        [ind1, ind2, wind1, wind2]=roulette(population, population_size, genome_length, option);%Selection methods
+        
+        parent1=population(ind1,:);
+        parent2=population(ind2,:);
+    
+        [child1, child2] = crossover( ...
+            parent1, parent2, ...
+            domain_start, domain_end, ...
+            fitness_function, genome_length, ...
+            probability_of_crossover);
+
+        population = mutate_two_children(population, child1, child2, ...
+            domain_start, domain_end, fitness_function, ...
+            genome_length, probability_of_mutation, ...
+            wind1, wind2);
+
+        population = hybridization( ...
+            population, genome_length, fitness_function, ...
+            domain_start, domain_end, ...
+            wind1, wind2);
+
+%         population_after_local_search = run_local_search_on_offspring( ...
+%             population, ...
+%             chromosome_length, ...
+%             fitness_function, ...
+%             wind1, wind2);
+        
+        elites = find_elites_from_pop(population, genome_length, eliteSize, elites);
+        if elite == 1
+           elitism(population, elites, eliteSize, genome_length);
         end
 
         population = population_prime;
@@ -74,7 +97,7 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
     
     xlabel('x');
     ylabel('M(x)');
-    plot(population(:,chromosome_length+1),population(:,chromosome_length+2),'g*');
+    plot(population(:,genome_length+1),population(:,genome_length+2),'g*');
     hleg1=legend('Function','Initial Optimum','Niche Points','Location','Southeast');
     axes(handles.axes2);
     plot(Fmax), hold on, plot(Faver,'r-'), hold on, plot(Fmin,'g');
@@ -200,4 +223,3 @@ function new_population = crossover_entire_population(population, benchmark_doma
         result = indeces(1) > indeces(2);
     end
 end
-

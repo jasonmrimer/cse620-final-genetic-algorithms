@@ -19,8 +19,6 @@ function [child]=mutation( ...
         child(mpoint)=abs(parent(mpoint)-1);
         child(:, chromosome_length+1)=sum(2.^(size(child(:,1:chromosome_length),2)-1:-1:0).*child(:,1:chromosome_length))*(domain_end-domain_start)/ (2.^chromosome_length-1)+domain_start;
         child(:, chromosome_length+2)=fitness_function(child(:, chromosome_length+1));
-        display("p: " + parent);
-        display("c: " + child);
     else
         child=parent;
     end

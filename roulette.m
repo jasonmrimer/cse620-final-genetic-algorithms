@@ -15,7 +15,7 @@ if option==1 || option==4
     ind2=max(find(prob==probsort(ind22)));
 
     wind1=max(find(prob==probsort(end),1,'first'));
-    wind2=max(find(prob==probsort(end-1),1,'first'));
+    wind2=max(find(prob==probsort(end-1),1,'first'));    
 else
     totalfit=sum(oldpop(:,2*stringlength+3));
     prob=oldpop(:,2*stringlength+3)/totalfit;

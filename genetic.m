@@ -68,6 +68,8 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
             population_prime=[population_prime; child1m];
             population_prime=[population_prime; child2m];
         end
+
+        population = population_prime;
     end
     
     xlabel('x');

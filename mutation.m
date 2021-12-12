@@ -31,5 +31,5 @@ function mutation_point = calculate_full_mutation_point(chromosome_length)
 end
 
 function mutation_point = calculate_limited_mutation_point(chromosome_length)
-    mutation_point=round(rand*(chromosome_length / 2-1))+1+chromosome_length / 2;
+    mutation_point=round(rand*(chromosome_length / 2-1)+1+chromosome_length / 2);
 end

@@ -31,6 +31,7 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
     breeder_percentage = 0.1;
 
     for j=1:total_generations
+
 %         population = crossover_entire_population(population, domain_start, domain_end, fitness_function, ...
 %             chromosome_length, probability_of_crossover);
 %         
@@ -46,7 +47,9 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
         
         population = calculate_fitness(population, population_size, chromosome_length, fitness_function);
         [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(population, chromosome_length);  
-    
+
+        population_prime = [];
+
         [ind1, ind2, wind1, wind2]=roulette(population, population_size, chromosome_length, option);%Selection methods
         
         parent1=population(ind1,:);
@@ -72,10 +75,11 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
 %             chromosome_length, ...
 %             fitness_function, ...
 %             wind1, wind2);
-        
-        elites = find_elites_from_pop(population, chromosome_length, eliteSize, elites);
-        if elite == 1
-           elitism(population, elites, eliteSize, chromosome_length);
+
+            elites = find_elites_from_pop(population, chromosome_length, eliteSize, elites);
+            if elite == 1
+                elitism(population, elites, eliteSize, chromosome_length);
+            end
         end
     end
     

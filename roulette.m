@@ -1,4 +1,4 @@
-function [ind1 ind2 wind1 wind2]=roulette(oldpop, popsize, stringlength, option)
+function [ind1, ind2, wind1, wind2]=roulette(oldpop, popsize, stringlength, option)
 %%%Description: roulette selection method
 
 if option==1 || option==4

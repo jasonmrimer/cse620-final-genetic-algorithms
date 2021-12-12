@@ -45,23 +45,28 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
         
         population = calculate_fitness(population, population_size, chromosome_length, fitness_function);
         [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(population, chromosome_length);  
-    
-        [ind1, ind2, wind1, wind2]=roulette(population, population_size, chromosome_length, option);%Selection methods
-        
-        parent1=population(ind1,:);
-        parent2=population(ind2,:);
-    
-        child1 = parent1;
-        child2 = parent2;
-        
-%         population = mutate_two_children(population, child1, child2, ...
-%             benchmark_domain_start, benchmark_domain_end, fitness_function, ...
-%             chromosome_length, probability_of_mutation, ...
-%             wind1, wind2);
-        
+
+        population_prime = [];
+
         elites = find_elites_from_pop(population, chromosome_length, eliteSize, elites);
         if elite == 1
-           elitism(population, elites, eliteSize, chromosome_length);
+            [maxFitness, elitesIdx] = maxk(elites(:,chromosome_length+2), eliteSize);
+            for e=1:size(elitesIdx, 1)
+                population_prime = [population_prime; elites(elitesIdx(e), :)];
+            end
+        end
+    
+        for p=1:size(population)/2
+            [ind1, ind2, wind1, wind2]=roulette(population, population_size, chromosome_length, option);%Selection methods
+        
+            parent1=population(ind1,:);
+            parent2=population(ind2,:);
+        
+            child1m=mutation(parent1, domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation);%mutation
+            child2m=mutation(parent2, domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation);
+    
+            population_prime=[population_prime; child1m];
+            population_prime=[population_prime; child2m];
         end
     end
     

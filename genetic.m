@@ -44,19 +44,6 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
             population = sharing(population, population_size, genome_length, option, sigmash, alpha);
         end
         
-        population = calculate_fitness(population, population_size, chromosome_length, fitness_function);
-        [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(population, chromosome_length);  
-
-        population_prime = [];
-
-        elites = find_elites_from_pop(population, chromosome_length, eliteSize, elites);
-        if elite == 1
-            [maxFitness, elitesIdx] = maxk(elites(:,chromosome_length+2), eliteSize);
-            for e=1:size(elitesIdx, 1)
-                population_prime = [population_prime; elites(elitesIdx(e), :)];
-            end
-        end
-    
         population = calculate_fitness(population, population_size, genome_length, fitness_function);
         [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(population, genome_length);  
     
@@ -91,8 +78,6 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
         if elite == 1
            elitism(population, elites, eliteSize, genome_length);
         end
-
-        population = population_prime;
     end
     
     xlabel('x');

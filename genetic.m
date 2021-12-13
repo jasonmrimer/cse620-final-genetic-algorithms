@@ -45,6 +45,19 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
         population = calculate_fitness(population, population_size, genome_length, fitness_function);
         [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(population, genome_length);  
     
+        population_prime = [];
+
+        elites = find_elites_from_pop(population, genome_length, eliteSize, elites);
+        if does_elite == 1
+            [maxFitness, elitesIdx] = maxk(elites(:,genome_length+2), eliteSize);
+            for e=1:size(elitesIdx, 1)
+                population_prime = [population_prime; elites(elitesIdx(e), :)];
+            end
+        end
+
+        population = calculate_fitness(population, population_size, genome_length, fitness_function);
+        [Fmax(j), Fmin(j), Faver(j)] = capture_generation_fitness_measures(population, genome_length);  
+
         [ind1, ind2, wind1, wind2]=roulette(population, population_size, genome_length, option);%Selection methods
         
         parent1=population(ind1,:);
@@ -67,6 +80,7 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
                 domain_start, domain_end, ...
                 wind1, wind2);
         end 
+
 
         elites = find_elites_from_pop(population, genome_length, eliteSize, elites);
         if does_elite == 1
@@ -150,23 +164,23 @@ function elites = find_elites_from_pop(pop, stringlength, eliteSize, elites);
     end
 end
 
-function population = mutate_two_children(population, child1, child2, benchmark_domain_start, benchmark_domain_end, benchmark_function, chromosome_length, probability_of_mutation, wind1, wind2)
-    child1m=mutation(child1, benchmark_domain_start, benchmark_domain_end, benchmark_function, chromosome_length, probability_of_mutation);%mutation
-    child2m=mutation(child2, benchmark_domain_start, benchmark_domain_end, benchmark_function, chromosome_length, probability_of_mutation);
+function population = mutate_two_children(population, child1, child2, benchmark_domain_start, benchmark_domain_end, benchmark_function, genome_length, probability_of_mutation, wind1, wind2)
+    child1m=mutation(child1, benchmark_domain_start, benchmark_domain_end, benchmark_function, genome_length, probability_of_mutation);%mutation
+    child2m=mutation(child2, benchmark_domain_start, benchmark_domain_end, benchmark_function, genome_length, probability_of_mutation);
     
     population(wind1,:)=child1m;
     population(wind2,:)=child2m;
 end
 
-function population = mutate_entire_population(population, domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation)
+function population = mutate_entire_population(population, domain_start, domain_end, fitness_function, genome_length, probability_of_mutation)
     for i = 1:size(population,1)
-        population(i,:) = mutation(population(i,:), domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation);
+        population(i,:) = mutation(population(i,:), domain_start, domain_end, fitness_function, genome_length, probability_of_mutation);
     end
 end
 
 function new_population = crossover_entire_population(population, benchmark_domain_start, benchmark_domain_end, benchmark_function, ...
-            chromosome_length, probability_of_crossover)
-%     new_population = zeros(size(population,1),chromosome_length + 2, 'single');
+            genome_length, probability_of_crossover)
+%     new_population = zeros(size(population,1),genome_length + 2, 'single');
     new_population = [];
     
     while (parents_remain(population))
@@ -180,7 +194,7 @@ function new_population = crossover_entire_population(population, benchmark_doma
         [child1, child2] = crossover( ...
             parent1, parent2, ...
             benchmark_domain_start, benchmark_domain_end, benchmark_function, ...
-            chromosome_length, probability_of_crossover);
+            genome_length, probability_of_crossover);
         new_population(end+1,:) = child1;
         new_population(end+1,:) = child2;
     end

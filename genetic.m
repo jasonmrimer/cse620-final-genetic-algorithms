@@ -34,11 +34,6 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
     plot_baseline_benchmark(option, population, genome_length);
 
     for j=1:total_generations
-%         population = crossover_entire_population(population, domain_start, domain_end, fitness_function, ...
-%             chromosome_length, probability_of_crossover);
-%         
-%         population = mutate_entire_population(population, domain_start, domain_end, fitness_function, chromosome_length, probability_of_mutation);
-%         
         if does_crowding==1
             population=crowding(population, population_size, genome_length, domain_start, domain_end, fitness_function, option);
         end

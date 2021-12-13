@@ -73,7 +73,7 @@ function [population, Fmax, Fmin, Faver, fitness_function]=genetic( ...
            elitism(population, elites, eliteSize, genome_length);
         end
 
-        population = population_prime;
+%        population = population_prime;
     end
     
     xlabel('x');
